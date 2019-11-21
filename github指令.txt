@@ -1,0 +1,181 @@
+看到udacity第二章-9
+
+多久一次提交(commit)+註解訊息(短訊)最好? 程式邏輯更改時進行提交一次
+Ex. 提交已經花1小時開發的一項新功能
+
+git init
+初始化版本庫，產生.git檔
+ls -a 檢視全部檔名
+
+git log 
+列出最近的 commit 及其相關信息（包括提交ID）
+要停止查看 git log 的输出，请按 q（表示退出）。
+
+git diff 提交ID 提交ID
+查看 commit 文件間的不同
+commit ID = hash值(通常一個長字串，打前面4個字元即可找到)
+
+git status
+檢視目前 本地工作目錄 中所有檔案的情形
+
+commit 提交前，會有以下順序:
+要上傳的多個檔案會在暫存區，綁定成一次 commit，然後添加到版本庫
+
+ Working Directory 本地工作目錄
+        |
+ Staging Area 暫存區
+        |
+    github 上的專案(版本庫)
+
+git add [文件名] 添加進暫存區
+git reset [文件名] 刪除暫存區文件
+git commit -m "版本敘述" 提交到版本庫
+
+git branch [分支名稱] 創建分支 
+git checkout [分支名稱] 切換到該分支
+
+git checkout [分支名稱] [符號] 以下符號可多重組合
+
+1.  ^ (往前一次提交，^^往前2次。以此類推)
+   git checkout HEAD^; 也是往前一次提交，當不知hash值
+
+1'. ^[數字] 指定回到第幾個 parent commit。
+
+2.  ~[數字] (一次往上多個commit)
+
+   git checkout HEAD~4; 往上推4次
+   git branch -f master HEAD~3; 強制移動 master 指向從 HEAD 往上數的第三個 parent commit。
+
+3. git checkout -b foo o/master
+   建立一個新的 foo branch 並且它會 track(追蹤) o/master。
+   當 o/master 更新時，foo branch 也跟著一起被更新，但要注意本地 master 並沒有被更新！
+
+合併分支
+
+1. git merge 合併分支 (分支消失)
+   Ex.創分支，分支 合併 回主支 :
+   git branch bugFix;
+   git checkout bugFix;
+   git commit;
+   git checkout master;
+   git commit;
+   git merge bugFix;
+
+2. git rebase master 將分支複製 接回 主支後，分支依然存在
+   *都要先切換到該支 在下指令
+
+取消git的修改有2種:
+
+1. git reset HEAD~1; 
+   "重寫歷史" 往回移動 branch，原來的 branch 所指向的 commit 好像從來沒有存在過一樣。
+   只對自己分支有效，對其他人的 remote branch 是無效的)
+
+
+2. git revert HEAD; 取消原本的修改，把現在這個狀態分享給別人
+
+任意移動 commit 指令集:
+
+1. git cherry-pick <Commit1> <Commit2> <...>
+   當你想要複製幾個 commit 並且接在你目前的位置（HEAD）下面的時候
+   使用該指令前提是很確定hash值
+
+2. git rebase -i HEAD~4 
+   當你想要移動你想要的 commit 的時候，並且想得知它們的hash值
+   互動式的 rebase，多-i會跑出一個ui介面，可以任選想要的 commit及重排序，接到某分支
+
+標籤 commit:
+
+1. git tag v1 C1
+   我們命名這個 tag 叫做 v1，並且讓它指向 commit C1
+   它可以永遠地指向某個特定的 commit，就像是表示一個"里程碑"一樣。
+   
+2. git describe <ref> 用來顯示離你最近的錨點（也就是 tag)
+   <ref> 是任何一個可以被 git 解讀成 commit 的位置，
+   如果你沒有指定的話，git 會以你目前所在的位置為準（HEAD）
+
+2'. 指令的輸出就像這樣：<tag>_<numCommits>_g<hash>
+    <tag> : 離 <ref> 最近的 tag， 
+    <numCommits> : 這個 tag 離 <ref> 有多少個 commit，
+    <hash> : <ref> 這個 commit 的 hash值
+
+github 遠端指令:
+
+1. git clone 從 github 複製一份專案到本地
+
+2. git checkout o/master
+   o = > 某個人的github專案
+   master => 它的主支
+
+3. git fetch 從github專案下載資料
+   主要用於
+   a. 下載別人 github 專案裡，我自己本地沒有的 commit
+   b. 更新別人的分支(remote branch) Ex. o/master
+   c. 此指令不會影響到本地自己的主支，不會更新本地主支到最新版本
+
+3-1. git fetch <remote> <place>
+
+     Ex. git fetch origin foo;
+     git 會到 remote 上的 foo branch，
+     下載所有不在本地上的 commit，然後將它們放到本地的 o/foo branch。
+
+     備註: 
+     <place> 可換成 <source>:<destination> 這裡與git push 相反
+               "遠端"分支名 : "本地"分支名
+3-2. 若留白<source>
+     Ex. git fetch origin :bar
+     會在本地上建立一個新的 bar branch。
+     
+4. git pull
+   一次下載全部最新的commit 並且 合併進本地主支
+    
+4'. git pull <remote>  <source>:<destination>  同3-1
+                   "遠端"分支名 : "本地"分支名  
+
+5. git fakeTeamwork [分支名稱] [數字]
+   可以指定 commit 到別人專案上的分支，及可設定推送幾次
+
+6. git push
+   上傳自己的 commit 到特定 github專案上 並做出相對應的更新
+
+6-1. 當自己寫好功能準備上傳，發現別人專案已經提交好幾個commit(版本超前你本地o/master)，
+     git push 會阻擋你，此時你因該... 
+
+     a. git fetch 先下載別人最新 commit 進本地
+     b. git marge o/master 合併進 o/master
+     c. git push 推進別人專案，完成更新
+    
+     a.+b.簡化:
+     git pull --rebase = git fetch + git marge
+
+6-2. git push <remote> <place> / git push origin master
+     <remote> : github上的專案名稱
+     <place> : 專案分支名稱
+     不管你現在切換到哪個分支，我都上傳本地主支中所有最新 commit 到 github上
+      
+6-3.  進階 <place> 參數可改成 git push origin <source>:<destination>
+      <source>! : <destination> => 本地分支名 : 遠端分支名
+      可以指定哪個本地分支裡的最新 commit 到 github上
+      ! = ~2 、 ^ 往上幾個 commit
+      若遠端分支名不存在！github 會自動幫你建立 branch 的名稱
+
+6-4. 若留白<source>
+     Ex. git push origin :foo
+     會同時刪除 本地 及 遠端 上的foo branch
+     
+7. git branch -u o/master foo
+   此指令將 foo branch 設定成 track(追蹤) o/master，
+   如果你現在已經 checkout 到 foo 這個 branch 上面，你就可以省略掉它
+    
+
+    
+   
+
+
+
+
+
+
+
+
+  
+
