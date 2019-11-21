@@ -1,0 +1,12 @@
+配置Notepad++當編輯器
+git config --global core.editor "'C:/Program Files (x86)/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin";
+git config --global push.default upstream;
+git config --global merge.conflictstyle diff3;
+
+設置自己的github帳密
+git config --global user.email "patapon1245rv@gmail.com";
+git config --global user.name "Tomorrow0w0";
+
+
+檢視使用者設定
+git config --list
